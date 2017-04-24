@@ -209,12 +209,6 @@ for c in cntsCircles:
 
 cv2.waitKey(0)
 
-# construct the argument parse and parse the arguments
-#ap = argparse.ArgumentParser()
-#ap.add_argument("-i", "--image", required=True,
-#	help="path to the input image")
-#args = vars(ap.parse_args())
-
 # define the answer key which maps the question number
 # to the correct answer
 ANSWER_KEY = {0: 1,
@@ -262,55 +256,3 @@ ANSWER_KEY = {0: 1,
               42: 2,
               43: 2,
               44: 1}
-
-# load the image, convert it to grayscale, blur it
-# slightly, then find edges
-image = cv2.imread('S_1_hppscan12.png')
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-#cv2.imshow("gray", gray)
-blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-#cv2.imshow("blurred", blurred)
-edged = cv2.Canny(blurred, 75, 200)
-#cv2.imshow("edged", edged)
-#cv2.imwrite('edged.png',edged)
-
-# find contours in the edge map, then initialize
-# the contour that corresponds to the document
-cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-cnts = cnts[0] if imutils.is_cv2() else cnts[1]
-docCnt = None
-
-# find contours in the edge map, then initialize
-# the contour that corresponds to the document
-cnts = cv2.findContours(edged.copy(), cv2.RETR_EXTERNAL,
-	cv2.CHAIN_APPROX_SIMPLE)
-cnts = cnts[0] if imutils.is_cv2() else cnts[1]
-docCnt = None
- 
-# ensure that at least one contour was found
-if len(cnts) > 0:
-	# sort the contours according to their size in
-	# descending order
-	cnts = sorted(cnts, key=cv2.contourArea, reverse=True)
- 
-	# loop over the sorted contours
-	for c in cnts:
-		# approximate the contour
-		peri = cv2.arcLength(c, True)
-		approx = cv2.approxPolyDP(c, 0.02 * peri, True)
- 
-		# if our approximated contour has four points,
-		# then we can assume we have found the paper
-		if len(approx) == 4:
-			docCnt = approx
-			break
-        
-# apply a four point perspective transform to both the
-# original image and grayscale image to obtain a top-down
-# birds eye view of the paper
-paper = four_point_transform(image, docCnt.reshape(4, 2))
-warped = four_point_transform(gray, docCnt.reshape(4, 2))
-
-
-cv2.waitKey(0)
-
