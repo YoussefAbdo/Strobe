@@ -174,15 +174,20 @@ for (i, c) in enumerate(cnts):
  
 	# show the image
 #cv2.namedWindow( "Image", cv2.WINDOW_AUTOSIZE)
-cv2.imshow("Image", image)
+#cv2.imshow("Image", image)
 pts = np.array([[138, 1451],[117, 277],[1112, 259],[1133, 1433]], dtype = "float32")
 pts2 = np.array(box, dtype = "float32")
 warped = four_point_transform(gray, pts2)
 cv2.imshow("Warped", warped)
 
+# Crop Image
+crop_img = warped[510:1120, 0:1000] # Crop from x, y, w, h -> 100, 200, 300, 400
+# NOTE: its img[y: y + h, x: x + w] and *not* img[x: x + w, y: y + h]
+cv2.imshow("cropped", crop_img)
+
 # apply Otsu's thresholding method to binarize the warped
 # piece of paper
-thresh = cv2.threshold(warped, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+thresh = cv2.threshold(crop_img, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 cv2.imshow("thresh", thresh)
 
 # find contours in the thresholded image, then initialize
